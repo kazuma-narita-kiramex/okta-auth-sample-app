@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -15,7 +17,7 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [],
+  css: ['~/assets/css/style.css'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [],
@@ -35,6 +37,7 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/auth-next',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -45,4 +48,39 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  auth: {
+    redirect: {
+      login: '/login',
+      logout: '/',
+      rewriteRedirects: false,
+      fullPathRedirect: true,
+    },
+    strategies: {
+      okta: {
+        scheme: 'oauth2',
+        endpoints: {
+          authorization: process.env.OAUTH_ISSUER + '/v1/authorize',
+          token: process.env.OAUTH_ISSUER + '/v1/token',
+          userInfo: process.env.OAUTH_ISSUER + '/v1/userinfo',
+          logout: {
+            url: process.env.OAUTH_ISSUER + '/v1/logout',
+            method: 'post',
+            propertyName: 'token',
+          },
+        },
+        token: {
+          property: 'access_token',
+          type: 'Bearer',
+          maxAge: 1800,
+        },
+        responseType: 'code',
+        grantType: 'authorization_code',
+        clientId: process.env.CLIENT_ID,
+        scope: ['openid', 'profile', 'email'],
+        codeChallengeMethod: 'S256',
+        autoLogout: true,
+      },
+    },
+  },
 }
