@@ -17,9 +17,9 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	if err := verifyIdToken(); err != nil {
-		fmt.Fprintln(w, "invalid token")
+		fmt.Fprintln(w, "invalid")
 	}
-	fmt.Fprintln(w, "valid token")
+	fmt.Fprintln(w, "valid")
 }
 
 func verifyIdToken() error {
