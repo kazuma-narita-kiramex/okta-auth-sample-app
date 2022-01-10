@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -16,10 +16,23 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	if err := verifyIdToken(); err != nil {
-		fmt.Fprintln(w, "invalid")
+	log.Print("start hander")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+	w.Header().Set("Content-Type", "application/json")
+
+	body := map[string]string{
+		"status": "veriry id token ng",
 	}
-	fmt.Fprintln(w, "valid")
+
+	if err := verifyIdToken(); err == nil {
+		body["status"] = "ok"
+	}
+
+	bytes, _ := json.Marshal(body)
+	w.Write(bytes)
+	return
 }
 
 func verifyIdToken() error {

@@ -16,6 +16,13 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
+  publicRuntimeConfig: {
+    SECRET_KEY: process.env.SECRET_KEY,
+    OAUTH_ISSUER: process.env.OAUTH_ISSUER,
+    CLIENT_ID: process.env.CLIENT_ID,
+    BACKEND_SERVER: process.env.BACKEND_SERVER || 'http://localhost:3001"',
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['~/assets/css/style.css'],
 
