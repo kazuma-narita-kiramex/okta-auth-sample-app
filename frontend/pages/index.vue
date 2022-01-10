@@ -9,8 +9,12 @@
         Go To Auth Page
       </NuxtLink>
       <div class="mt-20 min-w-full min-h-full border border-blue-500 rounded">
-        <h2 class="text-xl font-bold mt-3">Call Backend API With Okta Token</h2>
-        <p :class="{ 'text-red-500': invalid }">{{ backendResult }}</p>
+        <h2 class="text-xl font-bold m-3">
+          Call Backend API With Okta Access Token
+        </h2>
+        <p :class="{ 'text-red-500': invalid, 'text-green-500': valid }">
+          {{ backendResult }}
+        </p>
         <button
           class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white mt-1 mb-3 py-1 px-4 border border-blue-500 hover:border-transparent rounded"
           @click="callBackendAPI()"
@@ -29,6 +33,7 @@ export default Vue.extend({
   name: 'IndexPage',
   data() {
     return {
+      valid: false,
       invalid: false,
       backendResult: 'ready',
     }
@@ -36,10 +41,12 @@ export default Vue.extend({
   methods: {
     async callBackendAPI() {
       try {
+        this.valid = false
         this.invalid = false
         const result = await this.$axios.$get(this.$config.BACKEND_SERVER)
         if (result.status === 'ok') {
           this.backendResult = 'You Have Valid Token'
+          this.valid = true
         } else {
           this.backendResult = 'You Have Invalid Token'
           this.invalid = true
