@@ -70,11 +70,7 @@ export default {
           authorization: process.env.OAUTH_ISSUER + '/v1/authorize',
           token: process.env.OAUTH_ISSUER + '/v1/token',
           userInfo: process.env.OAUTH_ISSUER + '/v1/userinfo',
-          logout: {
-            url: process.env.OAUTH_ISSUER + '/v1/logout',
-            method: 'post',
-            propertyName: 'token',
-          },
+          logout: process.env.OAUTH_ISSUER + '/v1/logout',
         },
         token: {
           property: 'access_token',
