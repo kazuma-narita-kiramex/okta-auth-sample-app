@@ -7,14 +7,16 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/MicahParks/keyfunc"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
-	verifier "github.com/okta/okta-jwt-verifier-golang"
 )
 
 type Handler struct {
-	OauthIssuer string
-	ClientID    string
+	JWKS_URL string
+	ClientID string
 }
 
 func main() {
@@ -24,8 +26,8 @@ func main() {
 	}
 
 	handler := Handler{
-		OauthIssuer: os.Getenv("OAUTH_ISSUER"),
-		ClientID:    os.Getenv("CLIENT_ID"),
+		JWKS_URL: os.Getenv("JWKS_URL"),
+		ClientID: os.Getenv("CLIENT_ID"),
 	}
 
 	http.HandleFunc("/", handler.index)
@@ -70,17 +72,36 @@ func (h Handler) verifyToken(authHeader string) error {
 	tokenParts := strings.Split(authHeader, "Bearer ")
 	bearerToken := tokenParts[1]
 
-	tv := map[string]string{}
-	tv["aud"] = "api://default"
-	tv["cid"] = h.ClientID
-	jv := verifier.JwtVerifier{
-		Issuer:           h.OauthIssuer,
-		ClaimsToValidate: tv,
+	refreshInterval := time.Hour
+	options := keyfunc.Options{
+		RefreshInterval: refreshInterval,
+		RefreshErrorHandler: func(err error) {
+			log.Printf("There was an error with the jwt.KeyFunc\nError: %s", err.Error())
+		},
 	}
 
-	_, err := jv.New().VerifyAccessToken(bearerToken)
+	jwks, err := keyfunc.Get(h.JWKS_URL, options)
 	if err != nil {
+		log.Println("Failed to create JWKS from resource at the given URL.")
+		return nil
+	}
+
+	// Parse the JWT.
+	token, err := jwt.Parse(bearerToken, jwks.Keyfunc)
+	if err != nil {
+		log.Println("Failed to parse the JWT.")
 		return err
+	}
+
+	// Check if the token is valid.
+	if !token.Valid {
+		return errors.New("The token is not valid.")
+	}
+
+	// Check Claims
+	claims := token.Claims.(jwt.MapClaims)
+	if clientId, ok := claims["client_id"]; ok == false || clientId != h.ClientID {
+		return errors.New("client_id is not valid.")
 	}
 
 	return nil

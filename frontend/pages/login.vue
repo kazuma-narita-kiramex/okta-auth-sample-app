@@ -22,7 +22,7 @@ export default Vue.extend({
   name: 'LoginPage',
   mounted() {
     if (!this.$auth.loggedIn) {
-      this.$auth.loginWith('okta')
+      this.$auth.loginWith('cognito')
     } else {
       this.$router.push('/authenticated')
     }

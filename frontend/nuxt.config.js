@@ -64,23 +64,23 @@ export default {
       fullPathRedirect: true,
     },
     strategies: {
-      okta: {
+      cognito: {
         scheme: 'oauth2',
         endpoints: {
-          authorization: process.env.OAUTH_ISSUER + '/v1/authorize',
-          token: process.env.OAUTH_ISSUER + '/v1/token',
-          userInfo: process.env.OAUTH_ISSUER + '/v1/userinfo',
-          logout: process.env.OAUTH_ISSUER + '/v1/logout',
+          authorization: process.env.OAUTH_ISSUER + '/login',
+          token: process.env.OAUTH_ISSUER + '/oauth2/token',
+          userInfo: process.env.OAUTH_ISSUER + '/oauth2/userInfo',
+          logout: process.env.OAUTH_ISSUER + '/logout',
         },
         token: {
           property: 'access_token',
           type: 'Bearer',
           maxAge: 1800,
         },
-        responseType: 'code',
+        responseType: 'token',
         grantType: 'authorization_code',
         clientId: process.env.CLIENT_ID,
-        scope: ['openid', 'profile', 'email'],
+        scope: ['openid', 'email'],
         codeChallengeMethod: 'S256',
         autoLogout: true,
       },
