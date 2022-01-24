@@ -17,6 +17,7 @@ import (
 type Handler struct {
 	JWKS_URL string
 	ClientID string
+	Issure   string
 }
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 	handler := Handler{
 		JWKS_URL: os.Getenv("JWKS_URL"),
 		ClientID: os.Getenv("CLIENT_ID"),
+		Issure:   os.Getenv("ISSURE"),
 	}
 
 	http.HandleFunc("/", handler.index)
@@ -100,8 +102,11 @@ func (h Handler) verifyToken(authHeader string) error {
 
 	// Check Claims
 	claims := token.Claims.(jwt.MapClaims)
-	if clientId, ok := claims["client_id"]; ok == false || clientId != h.ClientID {
-		return errors.New("client_id is not valid.")
+	if aud, ok := claims["aud"]; ok == false || aud != h.ClientID {
+		return errors.New("aud is not valid.")
+	}
+	if iss, ok := claims["iss"]; ok == false || iss != h.Issure {
+		return errors.New("iss is not valid.")
 	}
 
 	return nil

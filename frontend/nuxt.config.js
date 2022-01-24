@@ -17,17 +17,27 @@ export default {
   },
 
   publicRuntimeConfig: {
-    SECRET_KEY: process.env.SECRET_KEY,
-    OAUTH_ISSUER: process.env.OAUTH_ISSUER,
-    CLIENT_ID: process.env.CLIENT_ID,
+    cognito: {
+      Region: process.env.REGION,
+      UserPoolId: process.env.COGNITO_USER_POOL_ID,
+      ClientId: process.env.COGNITO_USER_POOL_WEB_CLIENT_ID,
+      AppWebDomain: process.env.COGNITO_USER_POOL_APP_WEB_DOMAIN,
+      RedirectUriSignIn: 'http://localhost:3000/',
+      RedirectUriSignOut: 'http://localhost:3000/',
+      TokenScopesArray: ['openid', 'email'],
+    },
     BACKEND_SERVER: process.env.BACKEND_SERVER || 'http://localhost:3001"',
+  },
+
+  router: {
+    middleware: 'authenticated',
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['~/assets/css/style.css'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '~/plugins/amplify', mode: 'client' }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -44,7 +54,6 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -55,35 +64,4 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
-
-  auth: {
-    redirect: {
-      login: '/login',
-      logout: '/',
-      rewriteRedirects: false,
-      fullPathRedirect: true,
-    },
-    strategies: {
-      cognito: {
-        scheme: 'oauth2',
-        endpoints: {
-          authorization: process.env.OAUTH_ISSUER + '/login',
-          token: process.env.OAUTH_ISSUER + '/oauth2/token',
-          userInfo: process.env.OAUTH_ISSUER + '/oauth2/userInfo',
-          logout: process.env.OAUTH_ISSUER + '/logout',
-        },
-        token: {
-          property: 'access_token',
-          type: 'Bearer',
-          maxAge: 1800,
-        },
-        responseType: 'token',
-        grantType: 'authorization_code',
-        clientId: process.env.CLIENT_ID,
-        scope: ['openid', 'email'],
-        codeChallengeMethod: 'S256',
-        autoLogout: true,
-      },
-    },
-  },
 }

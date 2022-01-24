@@ -8,6 +8,7 @@
       >
         Go To Auth Page
       </NuxtLink>
+
       <div class="mt-20 min-w-full min-h-full border border-blue-500 rounded">
         <h2 class="text-xl font-bold m-3">
           Call Backend API With Okta Access Token
@@ -28,6 +29,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Auth } from 'aws-amplify'
 
 export default Vue.extend({
   name: 'IndexPage',
@@ -43,7 +45,13 @@ export default Vue.extend({
       try {
         this.valid = false
         this.invalid = false
-        const result = await this.$axios.$get(this.$config.BACKEND_SERVER)
+        const result = await this.$axios.$get(this.$config.BACKEND_SERVER, {
+          headers: {
+            Authorization:
+              'Bearer ' +
+              (await Auth.currentSession()).getIdToken().getJwtToken(),
+          },
+        })
         if (result.status === 'ok') {
           this.backendResult = 'You Have Valid Token'
           this.valid = true

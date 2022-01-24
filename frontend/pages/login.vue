@@ -17,15 +17,12 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Auth } from 'aws-amplify'
 
 export default Vue.extend({
   name: 'LoginPage',
-  mounted() {
-    if (!this.$auth.loggedIn) {
-      this.$auth.loginWith('cognito')
-    } else {
-      this.$router.push('/authenticated')
-    }
+  async mounted() {
+    await Auth.federatedSignIn()
   },
 })
 </script>
